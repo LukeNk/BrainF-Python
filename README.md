@@ -12,7 +12,7 @@ The output will be save at `output/file_name.py` and `output/file_name.bf`
 * Convert BrainF input to `.py` file
 
 ## Know issues
-* When use `>` in a loop, if will create a new list item in python, which can overload the memory. Can fix in BrainF code by add `><` before enter a loop.
+* When use `>` in a loop, it will create a new list item in python, which can overload the memory. Can fix in BrainF code by add `><` before enter a loop.
 
 ## Plan
 * Convert `.bf` file to `.py` file
