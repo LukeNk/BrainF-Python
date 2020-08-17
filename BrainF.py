@@ -20,6 +20,11 @@ def bf_py():
 	data = input('Your BrainF code:')
 	datal = len(data)
 
+	#create .bf file
+	a = open('output/' + f_name + '.bf', 'w+')
+	a.write(data)
+	a.close()
+	
 	#prepare .py file
 	f.write('mem = [0]\n')
 	f.write('cur = 0\n')
