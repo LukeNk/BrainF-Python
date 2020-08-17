@@ -1,0 +1,31 @@
+mem = [0]
+cur = 0
+mem[cur] = ord(input())
+cur += 1
+mem.append(0)
+mem[cur] += 1
+mem[cur] += 1
+mem[cur] += 1
+mem[cur] += 1
+mem[cur] += 1
+mem[cur] += 1
+while mem[cur] != 0:
+	cur -= 1
+	mem[cur] -= 1
+	mem[cur] -= 1
+	mem[cur] -= 1
+	mem[cur] -= 1
+	mem[cur] -= 1
+	mem[cur] -= 1
+	mem[cur] -= 1
+	mem[cur] -= 1
+	cur += 1
+	mem[cur] -= 1
+mem[cur] = ord(input())
+while mem[cur] != 0:
+	cur -= 1
+	mem[cur] += 1
+	cur += 1
+	mem[cur] -= 1
+cur -= 1
+print(chr(mem[cur]))
