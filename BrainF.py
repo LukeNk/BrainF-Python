@@ -1,70 +1,111 @@
 #main
+import os
 
 def option():
-	print('Please select option:')
-	print('[1] Convert BrainF input to Python file')
-
 	while True:
-		option = input('Your option:') 
-		if option == '1':
+		print('Please select option:')
+		print('[0] Exit')
+		print('[1] Convert BrainF input to Python file')
+		print('[2] Convert .bf file to .py file')
+
+		option = input('Your option: ') 
+		if option == '0':
+			exit()
+		elif option == '1':
+			print('')
+			in_py()
+		elif option == '2':
 			print('')
 			bf_py()
 		else:
-			exit()
+			print('Wrong option (Please select the number)')
 
-def bf_py():
+def in_py():
 	#the output indent is \t
 
 	f_name = input('Your .py file name:')
 	f = open('output/' + f_name +'.py', 'w+')
-	data = input('Your BrainF code:')
-	datal = len(data)
+	data = input('\nYour BrainF code:')
 
 	#create .bf file
 	a = open('output/' + f_name + '.bf', 'w+')
 	a.write(data)
 	a.close()
-	
-	#prepare .py file
-	f.write('mem = [0]\n')
-	f.write('cur = 0\n')
 
-	#file building var
+	#get output
+	out, info = e_bf_py(data)
+	f.write(out)
+	print('')
+	print(info)
+	print('File size: ' + str(os.path.getsize('output/' + f_name + '.py')) + ' bytes' +'\n')
+
+def bf_py():
+	path = input('Please input your .bf file path: ')
+	file_name = os.path.basename(path)
+	f = open(path, 'r')
+	out, info = e_bf_py(f.read())
+	f.close()
+	a = open('output/' + file_name[0:-3] + '.py', 'w+')
+	a.write(out)
+	print('')
+	print(info)
+	print('File size: ' + str(os.path.getsize('output/' + file_name[0:-3] + '.py')) + ' bytes' +'\n')
+
+#Engines
+def e_bf_py(data): #bf to py engine
+	#Building var
 	x = 0
 	b_cur = 0
 	b_list = 0
 	indent_l = 0
 	indent = ''
+	output = ''
+	datal = len(data)
+	in_loop = 0 #0 mean not in any loop
+	loop_new = 0 #mem slot need to create BEFORE enter the first loop
+
+	#build prepare
+	output += 'mem = [0]\n'
+	output += 'cur = 0\n'
 
 	while x < datal:
 		if data[x] == '+':
-			f.write(indent + 'mem[cur] += 1\n')
+			output += indent + 'mem[cur] += 1\n'
 
 		elif data[x] == '-':
-			f.write(indent + 'mem[cur] -= 1\n')
+			output += indent + 'mem[cur] -= 1\n'
 
 		elif data[x] == '>':
-			f.write(indent + 'cur += 1\n')
+			#because it will automatic create new memory slot, you should check to make sure you didn't create new memory slot to a loop
+			#simple put >< before a loop to make it save
+			output += indent + 'cur += 1\n'
 			b_cur += 1
-			if b_cur > b_list:
-				#because it will automatic create new memory slot, you should check to make sure you didn't create new memory slot to a loop
-				#simple put >< before a loop to make it save
-				f.write(indent + 'mem.append(0)\n')
+
+			if (b_cur > b_list) and in_loop == 0:
+				output += indent + 'mem.append(0)\n'
 				b_list += 1
+			elif (b_cur > b_list) and (in_loop != 0): #if in loop and new mem slot need to create
+				loop_new += 1
+
 
 		elif data[x] == '<':
-			f.write(indent + 'cur -= 1\n')
+			output += indent + 'cur -= 1\n'
 			b_cur -= 1
 
 		elif data[x] == ',':
-			f.write(indent + 'mem[cur] = ord(input())\n')
+			output += indent + 'mem[cur] = ord(input())\n'
 
 		elif data[x] == '.':
-			f.write(indent + 'print(chr(mem[cur]))\n')
+			output += indent + 'print(chr(mem[cur]), end="")\n'
 
 		elif data[x] == '[':
-			f.write(indent + 'while mem[cur] != 0:\n')
+			if in_loop == 0: #if not in loop (first loop)
+				output += indent + '{loop_data}\n' #write a {} so we can write data in later
+
+			output += indent + 'while mem[cur] != 0:\n'
+			indent_l += 1
 			indent += '\t'
+			in_loop += 1
 
 		elif data[x] == ']':
 			indent_l -= 1
@@ -75,14 +116,20 @@ def bf_py():
 				y += 1
 
 		else:
-			f.write(indent + '#' + data[x] + '\n')
+			output += indent + '#' + data[x] + '\n'
 
 		x += 1
 
-	f.close()
-	print('File complied\nFile info:')
-	print('Last cur position: {cur}\nMemory arrray len: {b_list}\n'.format(cur = b_cur, b_list = b_list))
+	#add loop_data about 
+	y = 0
+	loop_add = ''
+	while y < loop_new:
+		loop_add += 'mem.append(0)\n'
+		y += 1
 
+	outputf = output.format(loop_data = loop_add)
 
+	info = 'Build completed\nBuild info:\nCharacter count: {char}\nLast cur position: {cur}\nMemory arrray len: {b_list}\nLoop level: {loops}'.format(char = x, cur = b_cur, b_list = b_list+1, loops = in_loop)
+	return(outputf, info) #add loop data
 
 option()
