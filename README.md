@@ -1,5 +1,5 @@
 # BrainF-Python
-Small project that do thing between Python and BrainF
+Small project that do thing between Python and BrainF, BrainF interpreter, ThinkBrainF interpreter
 
 ## How to use
 When open, you will have a option selector to chose option (Please input number)
@@ -12,9 +12,17 @@ The output will be save at `output/file_name.py` and `output/file_name.bf`
 ### Convert .bf file to .py
 Input the file path, the engine will automatic convert and put it in `output/file_name.py`
 
+### BrainF interpreter
+Run BrainF command directly. __Notice:__ Everytime you enter the command, it run and after that will erase the memory
+
 ## Features:
 * Convert BrainF input to `.py` file
+* Convert `.bf` file to `.py` file
 
 ## Plan
 - [X] Convert `.bf` file to `.py` file
-- [ ] Run BrainF cmd directly 
+- [X] Run BrainF cmd directly 
+- [ ] Fix critical issue #2
+- [ ] Run .bf file
+- [ ] Convert `.py` file to `.bf` file
+- [ ] ThinkBrainF (a more useful BrainF)
