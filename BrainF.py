@@ -7,6 +7,7 @@ def option():
 		print('[0] Exit')
 		print('[1] Convert BrainF input to Python file')
 		print('[2] Convert .bf file to .py file')
+		print('[3] BrainF interpreter')
 
 		option = input('Your option: ') 
 		if option == '0':
@@ -17,6 +18,9 @@ def option():
 		elif option == '2':
 			print('')
 			bf_py()
+		elif option == '3':
+			print('')
+			bf_r()
 		else:
 			print('Wrong option (Please select the number)')
 
@@ -37,7 +41,7 @@ def in_py():
 	f.write(out)
 	print('')
 	print(info)
-	print('File size: ' + str(os.path.getsize('output/' + f_name + '.py')) + ' bytes' +'\n')
+	print('File size: ' + str(os.path.getsize('output/' + f_name + '.py')) + 'kb' + '\n')
 
 def bf_py():
 	path = input('Please input your .bf file path: ')
@@ -49,17 +53,31 @@ def bf_py():
 	a.write(out)
 	print('')
 	print(info)
-	print('File size: ' + str(os.path.getsize('output/' + file_name[0:-3] + '.py')) + ' bytes' +'\n')
+	print('File size: ' + str(os.path.getsize('output/' + file_name[0:-3] + '.py')) + 'kb' +'\n')
+
+def bf_r():
+	print('BrainF interpreter')
+	print('Write "!" to exit')
+
+	while True:
+		print('')
+		src = input('')
+		if "!" in src:
+			break
+		e_bf_r()
+
+
 
 #Engines
+
 def e_bf_py(data): #bf to py engine
 	#Building var
 	x = 0
-	b_cur = 0
-	b_list = 0
-	indent_l = 0
-	indent = ''
-	output = ''
+	b_cur = 0 #cursor pos
+	b_list = 0 #mem array len
+	indent_l = 0 #indent level
+	indent = '' #string contain indent
+	output = '' #output
 	datal = len(data)
 	in_loop = 0 #0 mean not in any loop
 	loop_new = 0 #mem slot need to create BEFORE enter the first loop
@@ -79,13 +97,16 @@ def e_bf_py(data): #bf to py engine
 			#because it will automatic create new memory slot, you should check to make sure you didn't create new memory slot to a loop
 			#simple put >< before a loop to make it save
 			output += indent + 'cur += 1\n'
+			output += indent + 'if cur >= len(mem):\n' #if cur is over the len(mem), add more mem
+			output += indent + '\tmem.append(0)\n'
+
 			b_cur += 1
 
-			if (b_cur > b_list) and in_loop == 0:
-				output += indent + 'mem.append(0)\n'
-				b_list += 1
-			elif (b_cur > b_list) and (in_loop != 0): #if in loop and new mem slot need to create
-				loop_new += 1
+			# if (b_cur > b_list) and in_loop == 0:
+			# 	output += indent + 'mem.append(0)\n'
+			# 	b_list += 1
+			# elif (b_cur > b_list) and (in_loop != 0): #if in loop and new mem slot need to create
+			# 	loop_new += 1
 
 
 		elif data[x] == '<':
@@ -99,8 +120,8 @@ def e_bf_py(data): #bf to py engine
 			output += indent + 'print(chr(mem[cur]), end="")\n'
 
 		elif data[x] == '[':
-			if in_loop == 0: #if not in loop (first loop)
-				output += indent + '{loop_data}\n' #write a {} so we can write data in later
+			# if in_loop == 0: #if not in loop (first loop)
+			# 	output += indent + '{loop_data}\n' #write a {} so we can write data in later
 
 			output += indent + 'while mem[cur] != 0:\n'
 			indent_l += 1
@@ -130,6 +151,39 @@ def e_bf_py(data): #bf to py engine
 	outputf = output.format(loop_data = loop_add)
 
 	info = 'Build completed\nBuild info:\nCharacter count: {char}\nLast cur position: {cur}\nMemory arrray len: {b_list}\nLoop level: {loops}'.format(char = x, cur = b_cur, b_list = b_list+1, loops = in_loop)
-	return(outputf, info) #add loop data
+	return(output, info) #add loop data
 
-option()
+
+def e_bf_r():
+	source = input()
+	import collections
+	loop_ptrs = {}
+	loop_stack = []
+	for ptr, opcode in enumerate(source):
+		if opcode == '[': loop_stack.append(ptr)
+		if opcode == ']':
+			if not loop_stack:
+				source = source[:ptr]
+				break
+			sptr = loop_stack.pop()
+			loop_ptrs[ptr], loop_ptrs[sptr] = sptr, ptr
+	if loop_stack:
+		raise SyntaxError ("unclosed loops at {}".format(loop_stack))
+	mem = collections.defaultdict(int)
+	cur = 0
+	ptr = 0
+	while ptr < len(source):
+		opcode = source[ptr]
+		if   opcode == '>': cur += 1
+		elif opcode == '<': cur -= 1
+		elif opcode == '+': mem[cur] += 1
+		elif opcode == '-': mem[cur] -= 1
+		elif opcode == ',': mem[cur] = input()
+		elif opcode == '.': print(chr(mem[cur]), end='')
+		elif (opcode == '[' and not mem[cur]) or (opcode == ']' and mem[cur]): 
+			ptr = loop_ptrs[ptr]
+		ptr += 1
+	
+
+if __name__ == "__main__":
+	option()
