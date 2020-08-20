@@ -5,27 +5,37 @@ def option():
 	while True:
 		print('Please select option:')
 		print('[0] Exit')
-		print('[1] Convert BrainF input to Python file')
-		print('[2] Convert .bf file to .py file')
-		print('[3] BrainF interpreter')
+		print('[1] Convert BrainF to Python')
+		print('[2] BrainF interpreter')
 
 		option = input('Your option: ') 
 		if option == '0':
 			exit()
+
 		elif option == '1':
 			print('')
-			in_py()
+			print('[1] BrainF input to .py file')
+			print('[2] .bf file to .py file')
+			option_2 = input('Your option: ')
+			if option_2 == '1':
+				print('')
+				in_py()
+			elif option_2 == '2':
+				print('')
+				bf_py()
+
 		elif option == '2':
 			print('')
-			bf_py()
-		elif option == '3':
-			print('')
 			bf_r()
+
 		else:
 			print('Wrong option (Please select the number)')
 
 def in_py():
 	#the output indent is \t
+
+	print('Please chose your build option:\n[1] Build include with interpreter')
+	build_option = input('Your option: ')
 
 	f_name = input('Your .py file name:')
 	f = open('output/' + f_name +'.py', 'w+')
@@ -37,23 +47,40 @@ def in_py():
 	a.close()
 
 	#get output
-	out, info = e_bf_py(data)
+	if build_option == '1': #build engine selection
+		out, info = e_bf_py_c(data)
+	elif build_option == '2':
+		out, info = e_bf_py(data)
+	else:
+		return('Wrong build selection, please try again')
+
 	f.write(out)
 	print('')
 	print(info)
-	print('File size: ' + str(os.path.getsize('output/' + f_name + '.py')) + 'kb' + '\n')
+	print('File size: ' + str(os.path.getsize('output/' + f_name + '.py')) + ' b' + '\n')
 
 def bf_py():
 	path = input('Please input your .bf file path: ')
+
+	print('Please chose your build option:\n[1] Build include with interpreter')
+	build_option = input('Your option: ')
+
 	file_name = os.path.basename(path)
 	f = open(path, 'r')
-	out, info = e_bf_py(f.read())
+
+	if build_option == '1': #build engine selection
+		out, info = e_bf_py_c(f.read())
+	elif build_option == '2':
+		out, info = e_bf_py(f.read())
+	else:
+		return('Wrong build selection, please try again')
+
 	f.close()
 	a = open('output/' + file_name[0:-3] + '.py', 'w+')
 	a.write(out)
 	print('')
 	print(info)
-	print('File size: ' + str(os.path.getsize('output/' + file_name[0:-3] + '.py')) + 'kb' +'\n')
+	print('File size: ' + str(os.path.getsize('output/' + file_name[0:-3] + '.py')) + ' b' +'\n')
 
 def bf_r():
 	print('BrainF interpreter')
@@ -70,7 +97,7 @@ def bf_r():
 
 #Engines
 
-def e_bf_py(data): #bf to py engine
+def e_bf_py_(data): #bf to py engine(need to fix)
 	#Building var
 	x = 0
 	b_cur = 0 #cursor pos
@@ -153,6 +180,15 @@ def e_bf_py(data): #bf to py engine
 	info = 'Build completed\nBuild info:\nCharacter count: {char}\nLast cur position: {cur}\nMemory arrray len: {b_list}\nLoop level: {loops}'.format(char = x, cur = b_cur, b_list = b_list+1, loops = in_loop)
 	return(output, info) #add loop data
 
+def e_bf_py_c(data): #bf to py engine that will add interpreter to the build file
+	f = open('data/interpreter.py', 'r')
+	interpreter = f.read()
+	output = interpreter + data + '")'
+
+	char_c = len(data)
+
+	info = 'Build completed\nBuild info\nCharacter count: {char}'.format(char = char_c)
+	return(output, info)
 
 def e_bf_r():
 	source = input()
