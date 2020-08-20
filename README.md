@@ -1,5 +1,5 @@
-# BrainF-Python
-Small project that do thing between Python and BrainF
+# ThinkBrainF-BrainF-Python
+Small project that do thing between Python, BrainF and ThinkBrainF
 
 ## How to use
 When open, you will have a option selector to chose option (Please input number)
