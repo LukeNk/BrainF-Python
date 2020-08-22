@@ -1,5 +1,7 @@
-# BrainF-Python
-Small project that do thing between Python and BrainF, BrainF interpreter, ThinkBrainF interpreter
+
+# BrainPeep
+Small project that do thing between Python, BrainF and ThinkBrainF \
+Include BrainPeep DE (BrainF and ThinkBrainF Development Enviroment and text editor) 
 
 ## How to use
 When open, you will have a option selector to chose option (Please input number)
